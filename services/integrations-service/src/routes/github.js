@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import { pool } from "../db.js";
 import { requireAuth } from "../authMiddleware.js";
 import { encrypt, decrypt } from "../crypto.js";
+import { asyncHandler } from "../asyncHandler.js";
 
 const router = Router();
 
@@ -92,7 +93,7 @@ async function describeGithubError(response, repoOwner, repoName) {
 }
 
 // POST /github/connect  { patToken, repoOwner, repoName }
-router.post("/connect", requireAuth, async (req, res) => {
+router.post("/connect", requireAuth, asyncHandler(async (req, res) => {
   const patToken = (req.body.patToken || "").trim();
   const repoOwner = (req.body.repoOwner || "").trim();
   const repoName = (req.body.repoName || "").trim();
@@ -134,39 +135,39 @@ router.post("/connect", requireAuth, async (req, res) => {
 
   const syncResult = await syncIssuesForUser(req.userId);
   res.status(201).json({ ok: true, sync: syncResult });
-});
+}));
 
 // GET /github/status
-router.get("/status", requireAuth, async (req, res) => {
+router.get("/status", requireAuth, asyncHandler(async (req, res) => {
   const result = await pool.query(
     "SELECT repo_owner, repo_name, connected_at FROM github_integrations WHERE user_id = $1",
     [req.userId]
   );
   res.json({ connected: result.rows.length > 0, integration: result.rows[0] || null });
-});
+}));
 
 // DELETE /github/disconnect
-router.delete("/disconnect", requireAuth, async (req, res) => {
+router.delete("/disconnect", requireAuth, asyncHandler(async (req, res) => {
   await pool.query("DELETE FROM github_integrations WHERE user_id = $1", [req.userId]);
   await pool.query("DELETE FROM github_issues_cache WHERE user_id = $1", [req.userId]);
   res.json({ ok: true });
-});
+}));
 
 // GET /github/issues  -> serves the cache (populated by /connect and the timer-triggered Azure Function)
-router.get("/issues", requireAuth, async (req, res) => {
+router.get("/issues", requireAuth, asyncHandler(async (req, res) => {
   const result = await pool.query(
     "SELECT * FROM github_issues_cache WHERE user_id = $1 ORDER BY updated_at_github DESC",
     [req.userId]
   );
   res.json({ issues: result.rows });
-});
+}));
 
 // POST /github/issues/refresh -> manual refresh button, in addition to the timer trigger
-router.post("/issues/refresh", requireAuth, async (req, res) => {
+router.post("/issues/refresh", requireAuth, asyncHandler(async (req, res) => {
   const result = await syncIssuesForUser(req.userId);
   if (result.reason) return res.status(502).json({ ...result, error: result.reason });
   res.json(result);
-});
+}));
 
 export async function syncIssuesForUser(userId) {
   const integration = await pool.query("SELECT * FROM github_integrations WHERE user_id = $1", [userId]);

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "../db.js";
 import { requireAuth } from "../authMiddleware.js";
+import { asyncHandler } from "../asyncHandler.js";
 
 const router = Router();
 
@@ -11,7 +12,7 @@ function issueToken(userId) {
 }
 
 // POST /auth/register  { email, password, toolIds: [uuid, ...] }
-router.post("/register", async (req, res) => {
+router.post("/register", asyncHandler(async (req, res) => {
   const { email, password, toolIds = [] } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: "email and password are required" });
@@ -38,10 +39,10 @@ router.post("/register", async (req, res) => {
 
   const token = issueToken(user.id);
   res.status(201).json({ token, user });
-});
+}));
 
 // POST /auth/login  { email, password }
-router.post("/login", async (req, res) => {
+router.post("/login", asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: "email and password are required" });
@@ -55,13 +56,13 @@ router.post("/login", async (req, res) => {
 
   const token = issueToken(user.id);
   res.json({ token, user: { id: user.id, email: user.email, created_at: user.created_at } });
-});
+}));
 
 // GET /auth/me
-router.get("/me", requireAuth, async (req, res) => {
+router.get("/me", requireAuth, asyncHandler(async (req, res) => {
   const result = await pool.query("SELECT id, email, created_at FROM users WHERE id = $1", [req.userId]);
   if (result.rows.length === 0) return res.status(404).json({ error: "User not found" });
   res.json({ user: result.rows[0] });
-});
+}));
 
 export default router;
