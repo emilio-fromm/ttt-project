@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ttt
+      POSTGRES_PASSWORD: ttt
+      POSTGRES_MULTIPLE_DATABASES: entries_db,integrations_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/create-multiple-dbs.sh:/docker-entrypoint-initdb.d/create-multiple-dbs.sh
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ttt"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    restart: unless-stopped
+    # --skipApiVersionCheck: the @azure/storage-blob SDK version this project pins sends a
+    # newer API version header than this Azurite image validates against by default, which
+    # makes it reject every request with "The API version ... is not supported by Azurite."
+    # This flag (Azurite's own documented workaround) tells it to stop checking instead of
+    # pinning the image to a specific tag that may drift out of sync again later.
+    command: "azurite --blobHost 0.0.0.0 --loose --skipApiVersionCheck"
+    ports:
+      - "10000:10000"
+
+  entries-service:
+    build: ./services/entries-service
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ENTRIES_DB_URL: postgres://ttt:ttt@postgres:5432/entries_db
+      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+      # The connection string above uses the internal Docker network hostname "azurite" so
+      # entries-service can reach the emulator -- but the browser can't resolve that host at
+      # all, so post-it images would upload fine and then just never render. This rewrites
+      # the image URLs handed to the frontend to the same port published on localhost below.
+      AZURE_STORAGE_PUBLIC_HOST: "localhost:10000"
+    volumes:
+      - ./services/entries-service:/app
+      - /app/node_modules
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+
+  integrations-service:
+    build: ./services/integrations-service
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      INTEGRATIONS_DB_URL: postgres://ttt:ttt@postgres:5432/integrations_db
+    ports:
+      - "4001:4001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    environment:
+      VITE_ENTRIES_API_URL: http://localhost:4000
+      VITE_INTEGRATIONS_API_URL: http://localhost:4001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - entries-service
+      - integrations-service
+
+volumes:
+  pgdata:

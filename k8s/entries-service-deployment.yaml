@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: entries-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: entries-service }
+  template:
+    metadata:
+      labels: { app: entries-service }
+    spec:
+      containers:
+        - name: entries-service
+          image: ttt-entries:latest
+          imagePullPolicy: IfNotPresent
+          ports: [{ containerPort: 4000 }]
+          envFrom:
+            - configMapRef: { name: ttt-config }
+            - secretRef: { name: ttt-secrets }
+          env:
+            - { name: ENTRIES_PORT, value: "4000" }
+          readinessProbe:
+            httpGet: { path: /health, port: 4000 }
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: 4000 }
+            initialDelaySeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: entries-service
+spec:
+  selector: { app: entries-service }
+  ports:
+    - { port: 4000, targetPort: 4000 }

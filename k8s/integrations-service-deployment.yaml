@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: integrations-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: integrations-service }
+  template:
+    metadata:
+      labels: { app: integrations-service }
+    spec:
+      containers:
+        - name: integrations-service
+          image: ttt-integrations:latest
+          imagePullPolicy: IfNotPresent
+          ports: [{ containerPort: 4001 }]
+          envFrom:
+            - configMapRef: { name: ttt-config }
+            - secretRef: { name: ttt-secrets }
+          env:
+            - { name: INTEGRATIONS_PORT, value: "4001" }
+          readinessProbe:
+            httpGet: { path: /health, port: 4001 }
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: 4001 }
+            initialDelaySeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: integrations-service
+spec:
+  selector: { app: integrations-service }
+  ports:
+    - { port: 4001, targetPort: 4001 }

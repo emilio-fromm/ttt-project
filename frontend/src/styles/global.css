@@ -1,0 +1,781 @@
+/* ---------------------------------------------------------------------
+   TTT design tokens
+   Palette: whiteboard white (#FFFFFF), dot-grid grey (#D8D8D8),
+            marker ink (#2B2B2E), post-it yellow (#FFE08A), pink (#F6C6E0),
+            periwinkle (#C7CFFA), mint (#BFE3C0), aqua (#A6E3E9), amber (#FFD9A0)
+   Type: display/handwriting = "Caveat", body/marker = "Kalam"
+   Signature: the animated hand-drawn "TTT" wordmark on load
+   --------------------------------------------------------------------- */
+
+:root {
+  --board-white: #fefefe;
+  --dot-grey: #dcdcdc;
+  --ink: #2b2b2e;
+  --ink-soft: #55555c;
+  --accent: #ff6f59;
+
+  --post-yellow: #ffe08a;
+  --post-pink: #f6c6e0;
+  --post-periwinkle: #c7cffa;
+  --post-mint: #bfe3c0;
+  --post-aqua: #a6e3e9;
+  --post-amber: #ffd9a0;
+
+  --font-display: "Caveat", cursive;
+  --font-body: "Kalam", cursive;
+
+  --radius-card: 10px;
+  --shadow-post: 3px 6px 10px rgba(0, 0, 0, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: var(--board-white);
+  background-image: radial-gradient(var(--dot-grey) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  font-family: var(--font-body);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* -------------------- Marker-style inputs & buttons -------------------- */
+
+.marker-input,
+.marker-textarea,
+.marker-select {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  border: none;
+  border-bottom: 3px solid var(--ink);
+  background: transparent;
+  padding: 8px 4px;
+  outline: none;
+  width: 100%;
+}
+
+.marker-textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.marker-btn {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--board-white);
+  padding: 8px 26px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.marker-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.marker-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.marker-btn.primary {
+  background: var(--accent);
+  color: white;
+}
+
+.marker-btn.ghost {
+  border-style: dashed;
+}
+
+.marker-btn.small {
+  font-size: 1rem;
+  padding: 4px 16px;
+}
+
+.error-note {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: #c1442e;
+  border: 2px dashed #c1442e;
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: inline-block;
+}
+
+/* ------------------------------- Navbar -------------------------------- */
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  border-bottom: 3px solid var(--ink);
+}
+
+.navbar .logo {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.navbar nav {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+
+.navbar nav a {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+
+.navbar nav a.active,
+.navbar nav a:hover {
+  border-bottom: 3px solid var(--accent);
+}
+
+/* ------------------------------ Hero title ------------------------------ */
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+  display: inline-block;
+  background-image: linear-gradient(var(--ink), var(--ink));
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: write-in 1.6s ease forwards;
+}
+
+.hero-subtitle {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--ink-soft);
+  opacity: 0;
+  animation: fade-up 0.8s ease 1.4s forwards;
+}
+
+@keyframes write-in {
+  0% {
+    background-size: 0% 100%;
+  }
+  100% {
+    background-size: 100% 100%;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------ Post-its ------------------------------- */
+
+.corkboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  padding-top: 12px;
+}
+
+.post-it {
+  width: 220px;
+  min-height: 180px;
+  padding: 18px 16px 14px;
+  border-radius: 2px;
+  box-shadow: var(--shadow-post);
+  font-family: var(--font-body);
+  position: relative;
+  transition: transform 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.post-it:hover {
+  transform: scale(1.04) rotate(0deg) !important;
+  z-index: 5;
+}
+
+.post-it .post-it-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.post-it .post-it-body {
+  font-size: 0.95rem;
+  color: var(--ink);
+  flex: 1;
+  white-space: pre-wrap;
+}
+
+.post-it img.post-it-photo {
+  width: 100%;
+  border-radius: 3px;
+  box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.25);
+  object-fit: cover;
+  max-height: 130px;
+}
+
+.post-it .post-it-delete {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  background: none;
+  border: none;
+  opacity: 0.55;
+}
+
+.post-it .post-it-delete:hover {
+  opacity: 1;
+}
+
+.new-post-it {
+  width: 220px;
+  min-height: 180px;
+  border: 3px dashed var(--ink);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--ink-soft);
+  background: transparent;
+}
+
+.new-post-it:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+/* ------------------------------ Day board ------------------------------- */
+
+.day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.day-header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.day-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.day-picker input[type="date"] {
+  width: auto;
+}
+
+.board-subheading {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin: 0 0 10px;
+}
+
+.board-section {
+  margin-bottom: 40px;
+  padding-top: 20px;
+  border-top: 2px dashed var(--dot-grey);
+}
+
+.board-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.board-section-heading img {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+}
+
+.board-section-heading h3 {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  margin: 0;
+}
+
+/* Tools sit side by side; each column's post-its stack vertically underneath it. */
+.board-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  overflow-x: auto;
+  padding: 20px 4px 40px;
+  margin-bottom: 12px;
+  border-top: 2px dashed var(--dot-grey);
+}
+
+.board-column {
+  flex: 0 0 240px;
+  display: flex;
+  flex-direction: column;
+}
+
+.board-column-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.board-column-heading img {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+}
+
+.board-column-heading h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.tool-info {
+  display: inline-flex;
+  outline: none;
+}
+
+.tool-info-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--board-white);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.85rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+/* Positioned via inline style (position: fixed, top/left/width) computed in JS -- see
+   ToolInfo.jsx -- so it can float above document.body instead of being clipped by
+   .board-row's scroll container. */
+.tool-info-popover {
+  z-index: 60;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: var(--board-white);
+  box-shadow: 4px 4px 0 var(--ink);
+  padding: 16px;
+}
+
+.tool-info-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.tool-info-url {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+  word-break: break-all;
+}
+
+/* Fixed width AND height (not just width) so the preview box always reads as a big,
+   prominent rectangle -- regardless of whatever the screenshot service actually returns
+   (the real 800x500 screenshot, a smaller "still loading" placeholder, whatever). */
+.tool-info-preview {
+  display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 6px;
+  border: 2px solid var(--ink);
+  background: var(--dot-grey);
+  margin-bottom: 10px;
+}
+
+.tool-info-preview-fallback {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0 0 10px;
+}
+
+.tool-info-cost {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.corkboard-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.corkboard-stack .post-it,
+.corkboard-stack .new-post-it {
+  width: 100%;
+}
+
+.open-app-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+}
+
+.news-card {
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  background: var(--board-white);
+  box-shadow: 3px 3px 0 var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.news-card .news-source {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.news-card .news-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.news-card .news-description {
+  font-size: 0.88rem;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* ------------------------------ Tool tiles ------------------------------ */
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 22px;
+}
+
+.tool-tile {
+  background: var(--board-white);
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.12s ease;
+}
+
+.tool-tile:hover {
+  transform: translateY(-3px);
+}
+
+.tool-tile img {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+}
+
+.tool-tile .tool-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.tool-tile .tool-badge {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+/* ------------------------------ Auth forms ------------------------------ */
+
+.auth-card {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 32px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: var(--board-white);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.field-group {
+  margin-bottom: 18px;
+}
+
+.field-label {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.info-disclosure {
+  border: 2px dashed var(--dot-grey);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+}
+
+.info-disclosure summary {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+.info-disclosure-body {
+  margin-top: 10px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.info-disclosure-body ol {
+  margin: 6px 0 14px;
+  padding-left: 20px;
+}
+
+.info-disclosure-body code {
+  background: var(--dot-grey);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.tool-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  margin: 14px 0 20px;
+}
+
+.tool-picker-item {
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  padding: 8px 4px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--board-white);
+}
+
+.tool-picker-item img {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+}
+
+.tool-picker-item.selected {
+  background: var(--post-yellow);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.tool-settings-btn {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.tool-settings-btn:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* ------------------------------ Modal ------------------------------ */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 43, 46, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal-card {
+  background: var(--board-white);
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: 28px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.billing-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.billing-toggle-option {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--board-white);
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.billing-toggle-option.active {
+  background: var(--post-yellow);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+/* ------------------------------ Misc ------------------------------ */
+
+.section-heading {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  margin: 0 0 18px;
+}
+
+.greeting {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--ink-soft);
+  margin-bottom: 26px;
+}
+
+.empty-state {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--ink-soft);
+  border: 3px dashed var(--dot-grey);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+}
+
+.issue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.issue-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  padding: 10px 16px;
+  background: var(--board-white);
+}
+
+.issue-row .state-pill {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+}
+
+.issue-row .state-pill.open {
+  background: var(--post-mint);
+}
+
+.issue-row .state-pill.closed {
+  background: var(--post-periwinkle);
+}
+
+/* ------------------------------- Footer --------------------------------- */
+
+.footer {
+  border-top: 3px solid var(--ink);
+  padding: 18px 32px;
+  text-align: center;
+}
+
+.footer p {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
