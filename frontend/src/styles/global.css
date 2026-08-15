@@ -827,3 +827,88 @@ button {
   border-radius: 8px;
   box-shadow: 3px 3px 0 var(--ink);
 }
+
+/* ------------------------------ Responsive ------------------------------ */
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 16px 60px;
+  }
+
+  .navbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .navbar nav {
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    width: 100%;
+  }
+
+  .navbar nav a {
+    font-size: 1.1rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 14vw, 4rem);
+  }
+
+  .day-header {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .day-header-center {
+    order: -1;
+    width: 100%;
+  }
+
+  .corkboard {
+    gap: 18px;
+  }
+
+  .corkboard .post-it,
+  .corkboard .new-post-it {
+    width: 100%;
+    max-width: 260px;
+  }
+
+  /* One tool column at a time, with a peek of the next -- an affordance to swipe
+     sideways for more, rather than a fixed desktop-width column on a phone screen. */
+  .board-column {
+    flex: 0 0 78vw;
+  }
+
+  .board-row {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .auth-card {
+    margin: 30px auto;
+    padding: 22px;
+  }
+
+  .tool-picker-item {
+    font-size: 0.9rem;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .modal-card {
+    padding: 20px;
+  }
+
+  .issue-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tool-info-popover {
+    padding: 12px;
+  }
+}
