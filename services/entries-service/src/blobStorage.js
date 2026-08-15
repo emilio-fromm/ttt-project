@@ -26,6 +26,11 @@ function toPublicUrl(internalUrl) {
   return url.toString();
 }
 
+// `access: "blob"` makes each uploaded image readable via its plain URL (no SAS token),
+// which is what PostIt.jsx relies on for a plain <img src>. Against a *real* Azure Storage
+// account (Azurite doesn't care), this fails with "Public access is not permitted on this
+// storage account" unless "Allow Blob public access" is turned on for the account first
+// (Azure Portal -> Storage Account -> Configuration) -- new accounts default that to off.
 let ensured = false;
 async function ensureContainer() {
   if (ensured) return;

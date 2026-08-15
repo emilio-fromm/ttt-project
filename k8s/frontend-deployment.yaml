@@ -16,8 +16,13 @@ spec:
           imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 5173 }]
           env:
-            - { name: VITE_ENTRIES_API_URL, value: "http://localhost:4000" }
-            - { name: VITE_INTEGRATIONS_API_URL, value: "http://localhost:4001" }
+            # Relative paths, not http://localhost:4000 -- "localhost" would mean the
+            # browser's own machine, not the cluster. These route through the ingress
+            # (see ingress.yaml's /api/entries and /api/integrations rules, which rewrite
+            # and forward to the right backend Service) so it works from any machine
+            # hitting the Minikube URL, not just the one port-forwarding matching ports.
+            - { name: VITE_ENTRIES_API_URL, value: "/api/entries" }
+            - { name: VITE_INTEGRATIONS_API_URL, value: "/api/integrations" }
 ---
 apiVersion: v1
 kind: Service
