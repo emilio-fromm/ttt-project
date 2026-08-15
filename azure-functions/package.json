@@ -1,0 +1,12 @@
+{
+  "name": "ttt-azure-functions",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "sharp": "^0.33.4",
+    "node-fetch": "^2.7.0"
+  }
+}
