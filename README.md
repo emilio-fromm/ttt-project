@@ -103,15 +103,30 @@ student subscriptions). Minikube is a full, real Kubernetes cluster — Deployme
 multiple replicas, readiness/liveness probes, Services, Ingress routing — it just runs
 locally instead of in the cloud, which is exactly what the assignment text permits.
 
-**How to verify the orchestration is real** (see the Minikube section above to set it up):
-- `kubectl get pods` — two replicas each of `entries-service`, `integrations-service` and
-  `ttt-frontend`, plus `postgres`, all `Running`.
-- `kubectl get svc` / `kubectl get ingress` — routing wired up.
-- `http://ttt.local/` — the actual app, served end-to-end through the cluster.
-- **Self-healing:** `kubectl delete pod <one of the entries-service pods>`, then immediately
-  `kubectl get pods` — a replacement pod is already spinning up on its own, no one touched it.
-- **Scaling:** `kubectl scale deployment entries-service --replicas=4`, then `kubectl get pods`
-  — four running instances.
+**Evidence it's real** (see the Minikube section above to reproduce it yourself):
+
+1. Baseline — 7 pods up (2× `entries-service`, 2× `integrations-service`, 2× `ttt-frontend`,
+   1× `postgres`), all `Running`, `0` restarts:
+
+   ![kubectl get pods, baseline](docs/k8s-screenshots/1.png)
+
+2. Self-healing — one `entries-service` pod deleted on purpose:
+
+   ![kubectl delete pod](docs/k8s-screenshots/kubectl-delete.png)
+
+   `kubectl get pods` run immediately after: the deleted pod is still `Terminating`, and
+   Kubernetes has *already* started a replacement (`...-rtgxh`, age `23s`) — nobody told it
+   to, the Deployment's replica count did:
+
+   ![kubectl get pods, after delete](docs/k8s-screenshots/2.png)
+
+3. Scaling — `entries-service` scaled up on purpose:
+
+   ![kubectl scale deployment](docs/k8s-screenshots/kubectl-scale.png)
+
+   `kubectl get pods` right after: 4 `entries-service` pods running instead of 2 (9 pods total):
+
+   ![kubectl get pods, after scaling](docs/k8s-screenshots/3.png)
 
 ## Environment variables
 

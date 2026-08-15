@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment secrets -- never commit real values, only .env.example
+.env
+.env.local
+
+# OS/editor artifacts
+.DS_Store
+*.swp
+
+# Azure Functions local state
+azure-functions/**/local.settings.json
+azure-functions/**/bin/
+azure-functions/**/obj/
+
+# Logs
+*.log
+npm-debug.log*
