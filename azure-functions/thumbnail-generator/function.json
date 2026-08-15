@@ -5,7 +5,8 @@
       "type": "blobTrigger",
       "direction": "in",
       "path": "entry-images/{name}",
-      "connection": "AzureWebJobsStorage"
+      "connection": "AzureWebJobsStorage",
+      "source": "EventGrid"
     },
     {
       "name": "outputBlob",
