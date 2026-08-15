@@ -1,17 +1,28 @@
-// A plain-language walkthrough of the app, written for anyone landing on it cold —
-// including whoever's grading this for my HTW Berlin coursework.
+import ToolMention, { toolIconUrl } from "../components/ToolMention";
+
+const SHOWCASE_TOOLS = ["GitHub", "Figma", "Notion", "Discord", "Canva"];
+
+// A plain-language walkthrough of the app: what it's for and how to use it.
 export default function ReadMe() {
   return (
     <div className="page">
       <h2 className="section-heading">Read me!</h2>
-      <p style={{ fontSize: "1.05rem", marginBottom: "10px" }}>
-        Hey 👋 I'm a student at <strong>HTW Berlin</strong>, and TTT ("Tool Task Tracker") is a side project I
-        built to solve a very specific problem of mine: I use a dozen different tools for uni and freelance
-        work — GitHub, Figma, Notion, Discord, Canva, my email — and I kept losing track of what I actually
-        needed to <em>do</em> in each one. Sticky notes on my monitor didn't scale, and a generic to-do app
-        didn't map to "which app do I need to open right now." So I built a whiteboard that's organized the
-        way my week actually is: by day, and by tool.
+      <p style={{ fontSize: "1.05rem", marginBottom: "14px" }}>
+        TTT ("Tool Task Tracker") grew out of a problem I kept running into this semester: juggling a dozen
+        different tools for coursework and freelance work, and losing track of what I actually needed to{" "}
+        <em>do</em> in each one. Sticky notes on my monitor didn't scale, and a generic to-do app never
+        mapped to "which app do I need to open right now." So I built a whiteboard organized the way my week
+        actually works: by day, and by tool.
       </p>
+
+      <div className="tool-showcase">
+        {SHOWCASE_TOOLS.map((name) => (
+          <span key={name} className="tool-showcase-item">
+            <img src={toolIconUrl(name)} alt="" />
+            {name}
+          </span>
+        ))}
+      </div>
 
       <h3 className="board-subheading">Why a board organized by day, not a flat to-do list</h3>
       <p style={{ marginBottom: "24px" }}>
@@ -33,14 +44,14 @@ export default function ReadMe() {
           first.
         </li>
         <li>
-          Under "Tools in use today" I click <strong>GitHub</strong>, <strong>Figma</strong> and{" "}
-          <strong>Discord</strong> — they're only shown as options because I already added them once in{" "}
-          <strong>Settings</strong>.
+          Under "Tools in use today" I click <ToolMention name="GitHub" />, <ToolMention name="Figma" /> and{" "}
+          <ToolMention name="Discord" /> — they're only shown as options because I already added them once
+          in <strong>Settings</strong>.
         </li>
         <li>Three columns appear side by side. I stick one post-it under each, describing exactly what's outstanding.</li>
         <li>
           When I'm actually ready to do the work, I don't go hunting for a bookmark — I hit the{" "}
-          <strong>"Open GitHub ↗"</strong> button under that column's notes and I'm on github.com.
+          <strong>"Open GitHub"</strong> button under that column's notes and I'm on github.com.
         </li>
       </ol>
 
@@ -62,64 +73,53 @@ export default function ReadMe() {
       <h3 className="board-subheading">Feature tour</h3>
 
       <p style={{ marginBottom: "14px" }}>
-        <strong>📅 The board, organized by day.</strong> Every note and every "tool in use" choice belongs to
-        a specific date. Use the ← Prev / Next → buttons or the date picker to jump around; nothing you add
-        on Tuesday clutters Wednesday's board.
+        <strong>The board, organized by day.</strong> Every note and every "tool in use" choice belongs to a
+        specific date. Use the Prev / Next buttons or the date picker to jump around; nothing you add on
+        Tuesday clutters Wednesday's board.
       </p>
 
       <p style={{ marginBottom: "14px" }}>
-        <strong>🗂️ Tool columns, post-its stacked underneath.</strong> Each tool you pull onto a day gets its
+        <strong>Tool columns, post-its stacked underneath.</strong> Each tool you pull onto a day gets its
         own column, side by side with the others (like the example above). Post-its for that tool stack
         vertically underneath its icon — click "+ New post-it" to add one, with an optional description and
         photo.
       </p>
 
       <p style={{ marginBottom: "14px" }}>
-        <strong>ⓘ Tool info, on hover.</strong> Next to every tool's name on the board sits a small "i" —
-        hover (or tab to it) and a card pops up with the tool's URL, a live screenshot preview of the site,
-        and its subscription cost (monthly or yearly), if you've set that in Settings.
+        <strong>Tool info, on hover.</strong> Next to every tool's name on the board sits a small "i" — hover
+        (or tab to it) and a card pops up with the tool's URL, a live screenshot preview of the site, and its
+        subscription cost (monthly or yearly), if you've set that in Settings.
       </p>
 
       <p style={{ marginBottom: "14px" }}>
-        <strong>🔗 Open app.</strong> Every column ends with an "Open &lt;tool&gt; ↗" button that jumps
-        straight to that tool's actual website in a new tab — the whole point of the board is closing the
-        gap between "I wrote down what to do" and "I'm now doing it."
+        <strong>Open app.</strong> Every column ends with an "Open" button that jumps straight to that tool's
+        actual website in a new tab — the whole point of the board is closing the gap between "I wrote down
+        what to do" and "I'm now doing it."
       </p>
 
       <p style={{ marginBottom: "14px" }}>
-        <strong>📝 General notes.</strong> Not everything belongs to one app — "buy groceries" or "call
-        mom" isn't a GitHub task. Below the tool columns, every day also gets a general notes board for
-        anything that doesn't fit under a specific tool.
+        <strong>General notes.</strong> Not everything belongs to one app — "buy groceries" or "call mom"
+        isn't a GitHub task. Below the tool columns, every day also gets a general notes board for anything
+        that doesn't fit under a specific tool.
       </p>
 
       <p style={{ marginBottom: "14px" }}>
-        <strong>🐙 GitHub, live.</strong> GitHub isn't just an icon — connect a repo with a personal access
-        token on the GitHub tab and it pulls in your real issues, refreshed automatically.
+        <ToolMention name="GitHub" />, live. GitHub isn't just an icon — connect a repo with a personal
+        access token on the GitHub tab and it pulls in your real issues, refreshed automatically.
       </p>
 
       <p style={{ marginBottom: "14px" }}>
-        <strong>📰 Daily News.</strong> "Daily News" is a tool like any other — add it in Settings, pull it
-        onto a day, and its column shows one cached English-language headline for that date (from a free
-        news API), so catching up on the world can live on the same board as everything else.
+        <ToolMention name="Daily News" />. It's a tool like any other — add it in Settings, pull it onto a
+        day, and its column shows one cached English-language headline for that date, so catching up on the
+        world can live on the same board as everything else.
       </p>
 
-      <p style={{ marginBottom: "30px" }}>
-        <strong>⚙️ Settings.</strong> This is where you build your personal tool catalog — the pool that
-        "Tools in use today" picks from. Click the ⚙ on any tool to open a small dialog and set its
-        subscription cost and whether it's billed monthly or yearly (shows up in that tool's "i" popover on
-        the board). Adding a tool that isn't already listed needs its{" "}
-        <strong>full website address</strong> (e.g. <code>linear.app</code>), not just a name — that's what
-        the icon lookup actually needs to find the right favicon.
-      </p>
-
-      <h3 className="board-subheading">The technical bit, for HTW</h3>
       <p style={{ marginBottom: "0" }}>
-        Under the hood it's two independent Node/Express microservices (one for tools/notes, one for
-        third-party integrations) each with their own Postgres database, a React/Vite frontend, images in
-        Azure Blob Storage, two serverless functions (a blob-triggered thumbnail generator and a
-        timer-triggered GitHub issue sync), Docker containers for every service, and Kubernetes manifests to
-        orchestrate the lot — see the <code>README.md</code> in the repo for the full architecture and how
-        to run it locally.
+        <strong>Settings.</strong> This is where you build your personal tool catalog — the pool that "Tools
+        in use today" picks from. Click the gear icon on any tool to set its subscription cost and billing
+        period (shows up in that tool's "i" popover on the board). Adding a tool that isn't already listed
+        needs its <strong>full website address</strong> (e.g. <code>linear.app</code>), not just a name —
+        that's what the icon lookup needs to find the right favicon.
       </p>
     </div>
   );

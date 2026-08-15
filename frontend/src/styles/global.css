@@ -779,3 +779,43 @@ button {
   color: var(--ink-soft);
   margin: 0;
 }
+
+/* --------------------------- Tool mentions (Read me) --------------------------- */
+
+.tool-showcase {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 26px;
+}
+
+.tool-showcase-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 4px 14px 4px 6px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  background: var(--board-white);
+}
+
+.tool-showcase-item img {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+}
+
+.tool-mention {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.tool-mention-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}

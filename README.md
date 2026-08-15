@@ -41,7 +41,7 @@ This starts:
 Hot reload is on for both frontend (Vite) and backend (nodemon), so this is where you'll do ~90% of your
 testing while building.
 
-## 2. Kubernetes test (Minikube) — do this once things are stable
+## 2. Kubernetes test (Minikube)
 
 ```bash
 minikube start
@@ -51,25 +51,20 @@ docker build -t ttt-frontend ./frontend
 docker build -t ttt-entries ./services/entries-service
 docker build -t ttt-integrations ./services/integrations-service
 
-# Before applying: k8s/config.yaml's AZURE_STORAGE_CONNECTION_STRING still has the local
-# Azurite placeholder -- swap it for a real Azure Storage Account connection string first,
-# or image uploads will fail inside the cluster (there's no Azurite pod in k8s/).
+# k8s/config.yaml's AZURE_STORAGE_CONNECTION_STRING still has the local Azurite placeholder --
+# swap it for a real Azure Storage Account connection string first, or image uploads will fail
+# inside the cluster (there's no Azurite pod in k8s/).
 
 kubectl apply -f k8s/
 echo "$(minikube ip) ttt.local" | sudo tee -a /etc/hosts
 ```
 
-Then open `http://ttt.local/` in a browser.
-
-**Access it through the Ingress (`http://ttt.local/`), not `minikube service ttt-frontend --url`.**
+Access it through the ingress at `http://ttt.local/`, not `minikube service ttt-frontend --url`.
 The frontend talks to the backends over relative paths (`/api/entries`, `/api/integrations`) that only
 the ingress (`k8s/ingress.yaml`) knows how to route to the right Service — `minikube service` on the
-frontend alone bypasses the ingress entirely and the API calls would 404.
+frontend alone bypasses the ingress and the API calls would 404.
 
-Take screenshots of `kubectl get pods`, `kubectl get svc`, and the app running via `http://ttt.local/` —
-that's your Container Orchestration evidence for the submission.
-
-## 3. Cloud deployment (for the final submitted link)
+## 3. Cloud deployment
 
 - **Frontend** → Netlify or Vercel: connect the repo, root dir `frontend`, build command `npm run build`,
   publish dir `dist`.
@@ -77,33 +72,25 @@ that's your Container Orchestration evidence for the submission.
   the Dockerfile automatically. Add the env vars from `.env.example`.
 - **Postgres** → Render's free Postgres, or Azure Database for PostgreSQL.
 - **Blob Storage** → a real Azure Storage Account (swap `AZURE_STORAGE_CONNECTION_STRING` from Azurite's
-  dev value to the real one — nothing else changes).
+  dev value to the real one — nothing else changes). Note: "Allow Blob public access" needs to be enabled
+  on the storage account, since post-it images are served via plain public URLs.
 - **Azure Functions** → deploy `azure-functions/*` via the Azure Functions Core Tools or VS Code extension.
 
-## Where things actually run (grading evidence)
+## Where things run
 
-This project deliberately splits two requirements across different infrastructure, because
-the assignment lists them as two separate bullet points with different constraints:
+The hosted version linked in the submission — frontend, both backends, the databases, storage — runs on
+Netlify, Render, and Azure. None of that involves Kubernetes.
 
-**"Host the entire website" — live, always-on, at the submitted link:**
-- **Netlify** — the frontend (static build).
-- **Render** — both backend microservices (`entries-service`, `integrations-service`) *and*
-  their Postgres databases.
-- **Azure** — Blob Storage (uploaded post-it images) *and* both serverless Functions
-  (thumbnail generation, GitHub issue sync).
+Kubernetes orchestration is demonstrated separately, via Minikube run locally rather than hosted
+continuously. Azure Kubernetes Service was the first option, but the VM SKUs an AKS node pool needs are
+blocked on our student subscription's quota, so Minikube is what actually runs the Deployment/Service/
+Ingress setup below.
 
-None of the above involves Kubernetes, and that's intentional.
+- **Netlify** — frontend
+- **Render** — both backend microservices and their Postgres databases
+- **Azure** — Blob Storage and both serverless Functions
 
-**"Implement Container Orchestration" — Minikube, run on demand, not continuously hosted:**
-The assignment explicitly allows this: *"Kubernetes or any cloud services e.g., Azure
-Kubernetes Services"* and *"you can use any cloud-based tool or open-source to implement
-these concepts."* We tried Azure Kubernetes Service first; it's blocked by VM SKU quota
-limits on our student subscription (most SKUs an AKS node pool needs are disabled for
-student subscriptions). Minikube is a full, real Kubernetes cluster — Deployments with
-multiple replicas, readiness/liveness probes, Services, Ingress routing — it just runs
-locally instead of in the cloud, which is exactly what the assignment text permits.
-
-**Evidence it's real** (see the Minikube section above to reproduce it yourself):
+### Kubernetes evidence
 
 1. Baseline — 7 pods up (2× `entries-service`, 2× `integrations-service`, 2× `ttt-frontend`,
    1× `postgres`), all `Running`, `0` restarts:
@@ -114,9 +101,8 @@ locally instead of in the cloud, which is exactly what the assignment text permi
 
    ![kubectl delete pod](docs/k8s-screenshots/kubectl-delete.png)
 
-   `kubectl get pods` run immediately after: the deleted pod is still `Terminating`, and
-   Kubernetes has *already* started a replacement (`...-rtgxh`, age `23s`) — nobody told it
-   to, the Deployment's replica count did:
+   `kubectl get pods` right after: the deleted pod is still `Terminating`, and a replacement is already
+   `Running` (`...-rtgxh`, age `23s`) — the Deployment's replica count triggered that on its own:
 
    ![kubectl get pods, after delete](docs/k8s-screenshots/2.png)
 
@@ -131,13 +117,3 @@ locally instead of in the cloud, which is exactly what the assignment text permi
 ## Environment variables
 
 See `.env.example` in the repo root — copy it to `.env` before running docker-compose.
-
-## Required-feature checklist
-
-- [x] Microservice architecture (frontend + 2 independent backend services)
-- [x] Images stored in cloud storage (Azure Blob Storage / Azurite locally)
-- [x] REST API between frontend and backends
-- [x] Docker containers for every service
-- [x] Kubernetes manifests for orchestration (`k8s/`)
-- [x] Cloud hosting instructions (Netlify/Render/Azure)
-- [x] Two serverless components (thumbnail generator, GitHub issue cache)
